@@ -1,0 +1,427 @@
+#!/usr/bin/env python
+
+import sys
+import os
+import subprocess
+import threading
+import ConfigParser
+
+import gtk
+
+try:
+    import glib
+    TIMEOUT_ADD = glib.timeout_add
+    IDLE_ADD = glib.idle_add
+except ImportError:
+    import gobject
+    TIMEOUT_ADD = gobject.timeout_add
+    IDLE_ADD = gobject.idle_add
+
+# Needed to display notifications when a new message comes in.
+# Without, the icon will just change.
+try:
+    import pynotify
+except ImportError:
+    pynotify = None
+
+# Saving the password in a secure manner is possible if we have gnome-keyring.
+try:
+    import gnomekeyring as keyring
+except ImportError:
+    keyring = None
+
+# Provides an easy API to play a sound; provided by python-gnome2.
+try:
+    import gnome
+    import socket
+except ImportError:
+    gnome = None
+
+try:
+    import egg.trayicon
+except ImportError:
+    egg = None
+
+import redditmonitor
+import redditmonitor.ui
+
+
+REDDIT_ICON             = 'reddit_trans.png'
+NEW_MAIL_ICON           = 'new_mail_trans.png'
+BUSY_ICON               = 'busy.gif'
+DEFAULT_CHECK_INTERVAL  = 10 # Minutes
+REDDIT_INBOX_USER_URL   = 'http://www.reddit.com/message/inbox'
+NEW_MESSAGE_SOUND       = 'message-new-instant.wav'
+UI_DEFINITION           = 'reddit_tray_icon.ui'
+
+# This will be set to True when the program is run, if xdg-open is found
+# somewhere in the path.
+XDG_OPEN                = False
+
+
+def find_resources():
+    '''Checks to see if all the required files can be located. Returns true if
+    all the files can be located; returns false otherwise.'''
+    
+    global NEW_MESSAGE_SOUND, REDDIT_ICON, NEW_MAIL_ICON,BUSY_ICON,UI_DEFINITION
+    
+    resources = [
+        'sounds/%s' % NEW_MESSAGE_SOUND,
+        'icons/%s' % REDDIT_ICON,
+        'icons/%s' % NEW_MAIL_ICON,
+        'icons/%s' % BUSY_ICON,
+        UI_DEFINITION
+    ]
+    
+    if os.path.isfile(os.path.join(os.getcwd(), '.debug')):
+        NEW_MESSAGE_SOUND = os.path.join(os.getcwd(), resources[0])
+        REDDIT_ICON = os.path.join(os.getcwd(), resources[1])
+        NEW_MAIL_ICON = os.path.join(os.getcwd(), resources[2])
+        BUSY_ICON = os.path.join(os.getcwd(), resources[3])
+        UI_DEFINITION = os.path.join(os.getcwd(), resources[4])
+        return True
+    
+    paths = os.environ['XDG_DATA_DIRS'].split(':')
+    
+    found = []
+    
+    for path in paths:
+        rc_dir = os.path.join(path, 'reddit_monitor')
+        
+        if os.path.isdir(rc_dir):
+            for file in resources:
+                if os.path.isfile(os.path.join(rc_dir, file)):
+                    found.append(True)
+                else:
+                    found = []
+                    break
+            
+            if len(found) == len(resources):
+                break
+            else:
+                found = []
+    
+    if len(found) != len(resources):
+        return False
+    else:
+        NEW_MESSAGE_SOUND = os.path.join(rc_dir, resources[0])
+        REDDIT_ICON = os.path.join(rc_dir, resources[1])
+        NEW_MAIL_ICON = os.path.join(rc_dir, resources[2])
+        BUSY_ICON = os.path.join(rc_dir, resources[3])
+        UI_DEFINITION = os.path.join(rc_dir, resources[4])
+        return True
+
+
+def open_url(url):
+    '''Tries to use the xdg-open utility to open a URL in your prefered web
+    browser. If it's not installed we fallback on using the Python webbrowser
+    module which may choose the wrong browser in some cases.'''
+    
+    if XDG_OPEN:
+        subprocess.call(['xdg-open', url])
+    else:
+        webbrowser.open(url)
+
+
+class Application(object):
+    
+    config_dialog = None
+    tooltip = None
+    tray_icon = None
+    reddit = None
+    worker = None
+    timer = None
+    notification = None
+    
+    config = None
+    username = None
+    mail = None
+    karma = None
+    comment_karma = None
+    messages = None
+    checking = False
+    logged_in = False
+    
+    options = {
+        'interval'                   : None,
+        'notify'                     : None,
+        'remember_username_password' : None,
+        'login_automatically'        : None,
+        'sound'                      : None,
+    }
+    
+    resources = {
+        'reddit_icon'                : None,
+        'new_mail_icon'              : None,
+        'busy_icon'                  : None,
+        'ui_definition'              : None,
+        'sound_file'                 : None
+    }
+    
+    modules = {
+        'pynotify'                   : False,
+        'gnomekeyring'               : False,
+        'egg'                        : False,
+        'gnome'                      : False
+    }
+    
+    def __init__(self):
+        if pynotify:
+            self.modules['pynotify'] = True
+        
+        if keyring:
+            self.modules['gnomekeyring'] = True
+        
+        if egg:
+            self.modules['egg'] = True
+        
+        if gnome:
+            self.modules['gnome'] = True
+        
+        self.load_resources()
+        
+        self.config = self.load_config()
+        self.reddit = redditmonitor.Reddit()
+        self.config_dialog = redditmonitor.ui.ConfigDialog(self, *self.check_keyring())
+    
+    def load_resources(self):
+        self.resources['reddit_icon'] = REDDIT_ICON
+        self.resources['new_mail_icon'] = NEW_MAIL_ICON
+        self.resources['busy_icon'] = BUSY_ICON
+        self.resources['ui_definition'] = UI_DEFINITION
+        self.resources['sound_file'] = NEW_MESSAGE_SOUND
+    
+    def load_config(self):
+        config_file = os.path.expanduser('~/.config/reddit_monitor')
+        
+        if not os.path.exists(config_file):
+            self.options['interval'] = DEFAULT_CHECK_INTERVAL
+            
+            return None
+        else:
+            parser = ConfigParser.SafeConfigParser()
+            parser.read([config_file])
+            
+            self.options['interval'] = parser.getint('Reddit_Monitor', 'interval')
+            self.options['notify'] = parser.getboolean('Reddit_Monitor', 'notify')
+            self.options['remember_username_password'] = parser.getboolean('Reddit_Monitor', 'remember_username_password')
+            self.options['login_automatically'] = parser.getboolean('Reddit_Monitor', 'login_automatically')
+            self.options['sound'] = parser.getboolean('Reddit_Monitor', 'sound')
+            
+            return parser
+    
+    def save_config(self):
+        config_file = os.path.expanduser('~/.config/reddit_monitor')
+        
+        if os.path.exists(config_file):
+            os.remove(config_file)
+        
+        if not self.config:
+			self.config = ConfigParser.SafeConfigParser()
+        
+        if not self.config.has_section('Reddit_Monitor'):
+            self.config.add_section('Reddit_Monitor')
+        
+        for key in self.options:
+            self.config.set('Reddit_Monitor', key, str(self.options[key]))
+        
+        self.config.write(open(config_file, 'w'))
+    
+    def check_keyring(self):
+        if self.modules['gnomekeyring']:
+            try:
+                creds = keyring.find_items_sync(keyring.ITEM_GENERIC_SECRET,
+                                               {'app_ident' : 'Reddit Monitor'})
+                
+                # TODO: Provide a drop-down menu of all the available usernames.
+                #       We're selecting the newest one out of laziness.
+                return creds[0].attributes['username'], creds[0].secret
+            except keyring.NoMatchError:
+                return None, None
+        else:
+            return None, None
+    
+    def save_keyring(self, username, password):
+        keyring.item_create_sync(keyring.get_default_keyring_sync(),
+                                 keyring.ITEM_GENERIC_SECRET, 'Reddit Monitor',
+                                 {
+                                    'app_ident' : 'Reddit Monitor',
+                                    'username'  : username,
+                                 }, 
+                                 password, True)
+    
+    def quit(self, widget):
+        gtk.main_quit()
+        sys.exit(0)
+    
+    def login(self, username, password):
+        def check_logged_in():
+            if self.logged_in:
+                self.tray_icon = redditmonitor.ui.TrayIcon(self)
+                self.config_dialog.widgets.get_object('window').hide()
+                self.timer = TIMEOUT_ADD(self.options['interval'], self.update)
+                return False
+            else:
+                return True
+        
+        def login(username, password):
+            self.logged_in = False
+            
+            try:
+                self.reddit.login(username, password)
+                self.config_dialog.widgets.get_object('message_label').set_text('Fetching karma scores...')
+                self.karma, self.comment_karma = self.reddit.get_karma()
+                self.config_dialog.widgets.get_object('message_label').set_text('Checking for new messages...')
+                self.messages = self.reddit.get_new_mail()
+                self.username = username
+                self.config_dialog.widgets.get_object('message_label').set_markup('Logged in to reddit as <i>%s</i>.' % username)
+                
+                if self.options['remember_username_password']:
+                    self.save_keyring(username, password)
+                
+                self.save_config()
+                
+                self.logged_in = True
+            except redditmonitor.RedditInvalidUsernamePasswordException, e:
+                self.config_dialog.widgets.get_object('message_label').set_text(e.args[0])
+                self.config_dialog.set_sensitive(True)
+                self.config_dialog.widgets.get_object('username_entry').grab_focus()
+                
+                self.logged_in = False
+            finally:
+                self.checking = False
+        
+        IDLE_ADD(check_logged_in)
+        
+        self.worker = threading.Thread(target=login, args=(username, password))
+        self.worker.start()
+    
+    def update(self, widget=None):
+        if not self.checking:
+            self.checking = True
+            
+            self.tray_icon.set_icon(self.resources['busy_icon'])
+            self.tray_icon.menu.ui_manager.get_widget('/TrayMenu/Refresh').set_sensitive(False)
+            
+            def check():
+                messages_len = len(self.messages)
+                
+                self.karma, self.comment_karma = self.reddit.get_karma()
+                self.messages = self.reddit.get_new_mail()
+                
+                if self.messages:
+                    self.tray_icon.set_icon(self.resources['new_mail_icon'])
+                    
+                    if len(self.messages) > messages_len:
+                        self.show_notification()
+                        self.play_sound()
+                else:
+                    self.tray_icon.set_icon(self.resources['reddit_icon'])
+                
+                if self.messages:
+                    self.tray_icon.menu.ui_manager.get_widget('/TrayMenu/Reset').set_sensitive(True)
+                else:
+                    self.tray_icon.menu.ui_manager.get_widget('/TrayMenu/Reset').set_sensitive(False)
+                
+                self.tray_icon.menu.ui_manager.get_widget('/TrayMenu/Refresh').set_sensitive(True)
+                
+                self.checking = False
+
+            self.worker = threading.Thread(target=check)
+            self.worker.start()
+        
+        return True
+    
+    def play_sound(self, file=None):
+        if self.options['sound']:
+            if file:
+                gnome.sound_play(file)
+            else:
+                if self.resources['sound_file']:
+                    gnome.sound_play(self.resources['sound_file'])
+    
+    def clear_messages(self, widget=None):
+        if not self.checking:
+            self.checking = True
+            
+            def mark():
+                self.tray_icon.set_icon(self.resources['busy_icon'])
+                
+                self.reddit.mark_messages_as_read()
+                
+                self.tray_icon.set_icon(self.resources['reddit_icon'])
+                self.messages = []
+                
+                self.checking = False
+            
+            self.worker = threading.Thread(target=mark)
+            self.worker.start()
+    
+    def go_to_inbox(self, widget):
+        open_url(REDDIT_INBOX_USER_URL)
+    
+    def show_notification(self):
+        if self.options['notify']:
+            latest_message = self.messages[len(self.messages) - 1]
+            
+            notification_body = 'from <b>%s</b>\n\n%s' % (latest_message['author'], latest_message['body'])
+            self.notification = pynotify.Notification(latest_message['subject'], notification_body)
+            self.notification.add_action('home', 'Inbox', self.inbox_clicked)
+            self.notification.set_icon_from_pixbuf(gtk.gdk.pixbuf_new_from_file(self.resources['reddit_icon']))
+            
+            if latest_message['was_comment']:
+                self.notification.add_action('context', 'Context', self.context_clicked, latest_message['context'])
+            
+            self.notification.show()
+    
+    def toggle_notify(self, widget):
+        self.options['notify'] = widget.get_active()
+    
+    def toggle_sound(self, widget):
+        self.options['sound'] = widget.get_active()
+    
+    def inbox_clicked(self, n, action):
+        open_url(REDDIT_INBOX_USER_URL)
+        self.clear_messages()
+    
+    def context_clicked(self, n, action, context):
+        open_url('http://www.reddit.com' + context)
+        self.clear_messages()
+
+
+def main(args):
+    if gtk.check_version(2, 12, 0):
+        # This will return None if you have GTK+ version 2.12 or higher. It will
+        # return a less useful error string than the one we're going to display
+        # below otherwise.
+        print 'Reddit Monitor requires GTK+ (and it\'s Python bindings) version 2.12 or higher.'
+        sys.exit(1)
+    
+    if not find_resources():
+        print 'Unable to find required files. Reddit Monitor may be installed incorrectly.'
+        sys.exit(1)
+    
+    # Check to see if we have xdg-open.
+    for path in os.environ.get('PATH').split(':'):
+        if os.path.exists(os.path.join(path, 'xdg-open')):
+            global XDG_OPEN
+            XDG_OPEN = True
+    
+    if not XDG_OPEN:
+        import webbrowser
+    
+    # See if everything is in order to play some sounds:
+    if gnome:
+        gnome.sound_init(socket.gethostname())
+    
+    if pynotify:
+        pynotify.init('Reddit Monitor')
+    
+    gtk.gdk.threads_init()
+    
+    app = Application()
+    gtk.main()
+
+
+if __name__ == '__main__':
+    main(sys.argv)
