@@ -1,0 +1,8 @@
+*.pyc
+.debug
+test.py
+MANIFEST
+dist/*
+build/*
+*~*
+.directory

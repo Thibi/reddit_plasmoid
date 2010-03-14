@@ -1,0 +1,25 @@
+Release 0.1:
+    * Basic visual notification of new mail and karma score
+    * Run off of JSON user code
+    * Switch GTK to QT
+
+Release 0.2:
+    * Ability to utilize username and password
+    * Have operational options screen
+    * Icons completely flushed out
+    * KDE Wallet integration
+    * Popup notification available
+
+Release 0.3:
+    * Moderator message notification visually different
+    * Multiple username notifications
+    * Popup now has ability to include x characters of messages
+    * Selected account's karma shown upon hover of icon
+
+Release 1.0 includes:
+    * Ability to see both user and optionally moderator messages with a dual view icon.
+    * Final polishing of icons and UI
+    * Full i18n support
+
+   If possible:
+    * Send and receive messages without having to access the browser
