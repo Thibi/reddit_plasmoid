@@ -24,3 +24,4 @@ from PyKDE4.plasma import *
 from PyKDE4 import plasmascript
 from PyKDE4.kio import *
 from PyKDE4.solid import *
+
