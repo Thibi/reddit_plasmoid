@@ -1,0 +1,12 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource prefix="/icons" >
+        <file>../icons/busy.gif</file>
+        <file>../icons/mail.png</file>
+        <file>../icons/new_mail.png</file>
+        <file>../icons/new_mail_trans.png</file>
+        <file>../icons/reddit.png</file>
+        <file>../icons/reddit_border_trans.png</file>
+        <file>../icons/reddit_trans.png</file>
+        <file>../icons/reddithead.png</file>
+    </qresource>
+</RCC>
