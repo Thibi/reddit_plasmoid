@@ -20,6 +20,4 @@ Release 1.0 includes:
     * Ability to see both user and optionally moderator messages with a dual view icon.
     * Final polishing of icons and UI
     * Full i18n support
-
-   If possible:
     * Send and receive messages without having to access the browser

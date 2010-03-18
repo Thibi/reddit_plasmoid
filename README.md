@@ -19,7 +19,7 @@ Contributors to this Plasmoid fork:
 Dependencies
 ------------
 
-    kde				4.x	    
+    kde                         4.x	    
     plasma python script-engine	?
     python                      2.x  
     python-simplejson           ?           Included as part of Python 2.6
