@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # Reddit.py, a python lib capable of telling determining if you have a new reddit message.
-# Edited REDDIT_USER_AGENT - Was: Mozilla/4.0 (compatible; MSIE5.5; Windows NT
 
 # Copyright (C) 2009 Phillip (Philluminati) Taylor <Phillip.Taylor@bcs.org.uk>
 # 
@@ -31,6 +30,7 @@ except ImportError:
 
 
 REDDIT_USER_AGENT = { 'User-agent': 'Reddit Plasmoid' }
+    # Was: Mozilla/4.0 (compatible; MSIE5.5; Windows NT
 REDDIT_LOGIN_URL = 'http://www.reddit.com/api/login'
 REDDIT_INBOX_PAGE = 'http://www.reddit.com/message/inbox/.json'
 REDDIT_PROFILE_PAGE = 'http://www.reddit.com/user/%s/about.json'

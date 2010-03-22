@@ -4,6 +4,8 @@ What is it?
 It is a Python Plasmoid script that's designed to notify you of new messages 
 on reddit.  It was forked off of [Reddit Monitor](http://github.com/davekeogh/reddit_monitor) on 13 March 2010.
 
+*Do note that the plasmoid is not yet functional.*
+
 Contributors to Reddit Monitor:
 --------------------------------
 

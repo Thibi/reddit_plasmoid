@@ -14,7 +14,7 @@
    id="svg4217"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="new_mod.svg">
+   sodipodi:docname="Alien Head.svg">
   <defs
      id="defs4219">
     <inkscape:perspective
@@ -31,13 +31,6 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
-    <inkscape:perspective
-       id="perspective5677"
-       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
-       inkscape:vp_z="1 : 0.5 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_x="0 : 0.5 : 1"
-       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -47,8 +40,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.49497475"
-     inkscape:cx="313.38156"
-     inkscape:cy="390.10504"
+     inkscape:cx="334.54168"
+     inkscape:cy="520"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -74,12 +67,12 @@
      inkscape:groupmode="layer"
      id="layer1">
     <g
-       id="g5696"
-       transform="translate(-15.404566,-214.44298)">
+       id="g4254"
+       transform="matrix(24.999996,0,0,25,-9017.4234,-13009.317)">
       <circle
-         transform="matrix(25,0,0,25,-6147.9705,-9192.7323)"
+         transform="translate(114.16199,144.08567)"
          d="m 252.489,388.01401 c 0,1.49227 -1.20972,2.702 -2.702,2.702 -1.49227,0 -2.702,-1.20973 -2.702,-2.702 0,-1.49228 1.20973,-2.702 2.702,-2.702 1.49228,0 2.702,1.20972 2.702,2.702 z"
-         style="fill:#ffffff;stroke:#ff4500;stroke-width:1.10000002;stroke-opacity:1"
+         style="fill:#ffffff;stroke:#000000;stroke-width:1.10000002"
          sodipodi:ry="2.7019999"
          sodipodi:rx="2.7019999"
          sodipodi:cy="388.01401"
@@ -89,9 +82,9 @@
          r="2.7019999"
          id="circle2843" />
       <circle
-         transform="matrix(25,0,0,25,-6147.9705,-9192.7323)"
+         transform="translate(114.16199,144.08567)"
          d="m 274.59101,388.01401 c 0,1.49227 -1.20973,2.702 -2.702,2.702 -1.49228,0 -2.702,-1.20973 -2.702,-2.702 0,-1.49228 1.20972,-2.702 2.702,-2.702 1.49227,0 2.702,1.20972 2.702,2.702 z"
-         style="fill:#ffffff;fill-opacity:1;stroke:#ff4500;stroke-width:1.10000002;stroke-opacity:1"
+         style="fill:#ffffff;stroke:#000000;stroke-width:1.10000002"
          sodipodi:ry="2.7019999"
          sodipodi:rx="2.7019999"
          sodipodi:cy="388.01401"
@@ -101,13 +94,13 @@
          r="2.7019999"
          id="circle2845" />
       <path
-         style="fill:none;stroke:#ff4500;stroke-width:27.5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
-         d="m 560.25455,270.51775 c 0,0 0,0 -135.1,-31.8 l -49.65,156.95"
+         style="fill:none;stroke:#000000;stroke-width:1.10000002;stroke-linecap:round;stroke-linejoin:round"
+         d="m 382.49099,522.61567 c 0,0 0,0 -5.404,-1.272 l -1.986,6.278"
          id="path2847" />
       <circle
-         transform="matrix(25,0,0,25,-6147.9705,-9192.7323)"
+         transform="translate(114.16199,144.08567)"
          d="m 272.664,378.96701 c 0,1.17637 -0.95364,2.13 -2.13,2.13 -1.17637,0 -2.13,-0.95363 -2.13,-2.13 0,-1.17637 0.95363,-2.13 2.13,-2.13 1.17636,0 2.13,0.95363 2.13,2.13 z"
-         style="fill:#ffffff;stroke:#ff4500;stroke-width:1.10000002;stroke-opacity:1"
+         style="fill:#ffffff;stroke:#000000;stroke-width:1.10000002"
          sodipodi:ry="2.1300001"
          sodipodi:rx="2.1300001"
          sodipodi:cy="378.96701"
@@ -117,9 +110,9 @@
          r="2.1300001"
          id="circle2851" />
       <ellipse
-         transform="matrix(25,0,0,25,-6147.9705,-9192.7323)"
+         transform="translate(114.16199,144.08567)"
          d="m 273.01799,391.73001 c 0,4.41055 -5.47959,7.986 -12.239,7.986 -6.75941,0 -12.239,-3.57545 -12.239,-7.986 0,-4.41055 5.47959,-7.986 12.239,-7.986 6.75941,0 12.239,3.57545 12.239,7.986 z"
-         style="fill:#ffffff;stroke:#ff4500;stroke-width:1.10000002;stroke-opacity:1"
+         style="fill:#ffffff;stroke:#000000;stroke-width:1.10000002"
          sodipodi:ry="7.9860001"
          sodipodi:rx="12.239"
          sodipodi:cy="391.73001"
@@ -130,7 +123,8 @@
          ry="7.9860001"
          id="ellipse2863" />
       <g
-         id="g5691">
+         transform="translate(114.16199,144.08567)"
+         id="g2883">
         <circle
            d="m 257.96,390.17099 c 0,0.78977 -0.64023,1.43 -1.43,1.43 -0.78977,0 -1.43,-0.64023 -1.43,-1.43 0,-0.78977 0.64023,-1.43 1.43,-1.43 0.78977,0 1.43,0.64023 1.43,1.43 z"
            style="fill:#ff4500;stroke:#ff4500;stroke-width:1.10000002"
@@ -141,8 +135,7 @@
            cx="256.53"
            cy="390.17099"
            r="1.4299999"
-           id="circle2885"
-           transform="matrix(25,0,0,25,-6147.9705,-9192.7323)" />
+           id="circle2885" />
         <circle
            d="m 266.58302,390.17099 c 0,0.78977 -0.64024,1.43 -1.43,1.43 -0.78977,0 -1.43,-0.64023 -1.43,-1.43 0,-0.78977 0.64023,-1.43 1.43,-1.43 0.78976,0 1.43,0.64023 1.43,1.43 z"
            style="fill:#ff4500;stroke:#ff4500;stroke-width:1.10000002"
@@ -153,20 +146,15 @@
            cx="265.15302"
            cy="390.17099"
            r="1.4299999"
-           id="circle2887"
-           transform="matrix(25,0,0,25,-6147.9705,-9192.7323)" />
-        <circle
-           id="circle2845-4"
-           r="2.7019999"
-           cy="388.01401"
-           cx="271.88901"
-           sodipodi:cx="271.88901"
-           sodipodi:cy="388.01401"
-           sodipodi:rx="2.7019999"
-           sodipodi:ry="2.7019999"
-           style="fill:#ffffff;fill-opacity:1;stroke:#ff4500;stroke-width:1.10000002;stroke-opacity:1"
-           d="m 274.59101,388.01401 c 0,1.49227 -1.20973,2.702 -2.702,2.702 -1.49228,0 -2.702,-1.20973 -2.702,-2.702 0,-1.49228 1.20972,-2.702 2.702,-2.702 1.49227,0 2.702,1.20972 2.702,2.702 z"
-           transform="matrix(23.062731,0,0,23.062732,-5896.9856,-8247.5948)" />
+           id="circle2887" />
+        <path
+           style="fill:none;stroke:#000000;stroke-width:1.10000002;stroke-linecap:round"
+           d="m 256.61,395.407 c 1.066,1.066 2.786,1.271 4.212,1.271"
+           id="path2889" />
+        <path
+           style="fill:none;stroke:#000000;stroke-width:1.10000002;stroke-linecap:round"
+           d="m 265.065,395.407 c -1.067,1.066 -2.785,1.271 -4.212,1.271"
+           id="path2891" />
       </g>
     </g>
   </g>
